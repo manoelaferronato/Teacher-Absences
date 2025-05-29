@@ -1,0 +1,37 @@
+\begin{table}[!h]
+\centering
+\caption{Descriptive statistics of teachers by contract type}
+\centering
+\resizebox{\ifdim\width>\linewidth\linewidth\else\width\fi}{!}{
+\begin{threeparttable}
+\begin{tabular}[t]{lcccc}
+\toprule
+ & Civil-servant & Contract & Difference & SE\\
+\midrule
+\addlinespace[0.3em]
+\multicolumn{5}{l}{\textbf{General Characteristics}}\\
+\hspace{1em}Age & 48.09 & 42.21 & 5.88 & 0.01\\
+\hspace{1em}Experience & 12.62 & 2.53 & 10.10 & 0.00\\
+\hspace{1em}Women & 0.69 & 0.71 & -0.02 & 0.00\\
+\addlinespace[0.3em]
+\multicolumn{5}{l}{\textbf{Education and Training}}\\
+\hspace{1em}BA degree & 0.80 & 0.77 & 0.03 & 0.00\\
+\hspace{1em}MA (or other) degree & 0.20 & 0.22 & -0.02 & 0.00\\
+\addlinespace[0.3em]
+\multicolumn{5}{l}{\textbf{Absences}}\\
+\hspace{1em}Absence rate & 0.11 & 0.03 & 0.08 & 0.00\\
+\hspace{1em}Sick leave & 0.03 & 0.10 & - & -\\
+\hspace{1em}Justified absences & 0.04 & 0.06 & - & -\\
+\hspace{1em}Unjustified absences & 0.03 & 0.02 & - & -\\
+\hspace{1em}Seniority leave & 0.08 & 0.00 & - & -\\
+\hspace{1em}Maternity leave & 0.04 & 0.14 & - & -\\
+\hspace{1em}Accident leave & 0.00 & 0.00 & - & -\\
+\hspace{1em}Personal leave & 0.28 & 0.00 & - & -\\
+\bottomrule
+\end{tabular}
+\begin{tablenotes}[para]
+\item \textit{Note.} 
+\item Statistics were calculated using an unbalanced monthly panel from 2021 to 2023. Data for May 2021 is unavailable. Experience refers to the number of years since the earliest recorded contract. The 'MA (or other) degree' category includes master's, specialization, and doctoral degrees.
+\end{tablenotes}
+\end{threeparttable}}
+\end{table}

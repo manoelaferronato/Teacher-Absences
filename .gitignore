@@ -7,6 +7,6 @@
 # ==== pastas====
 0_raw/*
 
-1_data/df_teacher_level_bal.rds
+1_data/teacher_level_bal.rds
 
-1_data/df_teacher_level_unb.rds
+1_data/teacher_level_unb.rds

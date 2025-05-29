@@ -1,4 +1,4 @@
-git a# ==========================================================================================
+# ==========================================================================================
 # Data prep
 # Author: Manoela do Amaral Ferronato
 # Date: 05/2025
@@ -25,7 +25,7 @@ active_cs <- rbindlist(
     dt[, YEAR := as.integer(paste0("20", str_extract(basename(f), "\\d{4}") |> substr(3, 4)))]   # creating year variable
     setnames(dt, toupper(names(dt)))                                                             # UPPER-CASE the column names
     dt <- select(dt, DATE, YEAR, ID_INTERNO, UAC, CATEG_E, SEXO, ID_COR, DATA_NASCIMENTO,               # selecting columns
-                 DATA_INICIO_EXERCICIO_E)
+                 DATA_INICIO_EXERCICIO_E)                                                                             # remove duplicities 
     dt <- unique(dt)                                                                             # remove duplicities 
     dt                                                                                     
   }),
@@ -49,6 +49,9 @@ active_cs[, `:=`(
 )]
 
 
+# Removing duplicates that is caused by teachers with multiple contracts (we just want the info on the professor, not the contract)
+active_cs <- unique(active_cs)
+
 # ---- Dealing with inconsistencies: teachers who change race/color or sex
 # How frequently do they occur in the data?
 active_cs %>% 
@@ -57,7 +60,8 @@ active_cs %>%
     n_color = n_distinct(ID_COR,           na.rm = TRUE),
     n_sex   = n_distinct(SEXO,             na.rm = TRUE),
     n_birth = n_distinct(DATA_NASCIMENTO,  na.rm = TRUE),
-  ) %>% 
+  ) %>%
+  ungroup() %>%
   group_by(YEAR) %>%
   summarise(
     total_professores = n(),
@@ -68,6 +72,7 @@ active_cs %>%
     perc_sex = round(100 * sex_change / total_professores, 2),
     perc_date = round(100 * date_change / total_professores, 2)
   )
+
 
 # Removing these records 
 active_cs <- active_cs %>%
@@ -93,6 +98,7 @@ active_cs <- active_cs %>%
                                 CATEG_E == "C" ~ "NI",
                                 TRUE ~ NA))
 
+
 # Saving data
 #saveRDS(active_cs, file = paste0(getwd(), "/1_data/active_cs.rds"))
 
@@ -112,7 +118,6 @@ absences <- rbindlist(
     dt[, DATE := str_extract(basename(f), "(\\d{2})(\\d{2})")]                                   # extracting month and year from file name
     dt[, YEAR := as.integer(paste0("20", str_extract(basename(f), "\\d{4}") %>% substr(3, 4)))]   # creating year variable
     setnames(dt, toupper(names(dt)))                                                             # UPPER-CASE the column names
-    dt <- unique(dt)                                                                             # remove duplicities 
     dt <- select(dt, YEAR, DATE, ID_INTERNO, UA_EXERC, CIE_ESCOLA,                               # select columns
                  TT_DIAS_FALTA_MEDICA, TT_DIAS_FALTA_JUST, TT_DIAS_FALTA_INJUST,    
                  TT_DIAS_LIC_PREMIO, TT_DIAS_LIC_GESTANTE, TT_DIAS_LIC_ACID_TRAB,    
@@ -121,6 +126,9 @@ absences <- rbindlist(
   }),
   use.names = TRUE, fill = TRUE         
 )
+
+# Removing duplicates
+absences <- unique(absences)
 
 # ---- Dealing with inconsistencies: teachers who appear more than once per month
 # How frequently do they occur in the data?
@@ -150,7 +158,7 @@ absences <- absences %>%
 # ---------------------------------------
 # ------- Teachers' education data ------
 #----------------------------------------
-# No information for 05-2021
+# PS: No information for 05-2021
 
 # Reading the files names
 education_files <- list.files(path = paste0(getwd(), "/0_raw/teacher-education"), pattern = ".csv", full.names = TRUE, recursive = TRUE)
@@ -228,6 +236,7 @@ education <- education %>%
   
   # removing duplicates 
   distinct(YEAR, DATE, ID_INTERNO, CIE_ESCOLA, UA_EXERC, FORMACAO_1, FORMACAO_2, FORMACAO_3, FORMACAO_4, FORMACAO_5, NIVEL_FORMACAO, .keep_all = TRUE)
+
 
 # ---- Dealing with inconsistencies: teachers who appear more than once per month
 # How frequently do they occur in the data?
@@ -350,31 +359,31 @@ active_cs %>%
 #----------------------------------------
 
 # ------- Unbalanced panel
-df_teacher_level_unb <- active_cs %>%
+teacher_level_unb <- active_cs %>%
   inner_join(education, by = c("ID_INTERNO", "YEAR", "DATE", "UAC")) %>%            # return only teachers with info on education
   left_join(absences %>% select(-CIE_ESCOLA), by = c("ID_INTERNO", "YEAR",  "DATE", "UAC"))        # return all teachers and info on absences for those who have
   
   
 # Removing unused columns
-df_teacher_level_unb <- df_teacher_level_unb %>%
+teacher_level_unb <- teacher_level_unb %>%
   select(-c(CATEG_E, UAC))
 
 # Fixing school codes to match those in INEP databases
-setDT(df_teacher_level_unb)
+setDT(teacher_level_unb)
 
-df_teacher_level_unb[, CIE_ESCOLA := substr(
+teacher_level_unb[, CIE_ESCOLA := substr(
   paste0("00000000", CIE_ESCOLA), 
   nchar(paste0("00000000", CIE_ESCOLA)) - 7, 
   nchar(paste0("00000000", CIE_ESCOLA))
 )]
 
-df_teacher_level_unb[, CIE_ESCOLA := sub("^..", "35", CIE_ESCOLA)]
+teacher_level_unb[, CIE_ESCOLA := sub("^..", "35", CIE_ESCOLA)]
 
 # ------- Joining with dropout and censo info to get information on schools
 
-# Goal: measure how many records in the panel (df_teacher_level_unb)
+# Goal: measure how many records in the panel (teacher_level_unb)
 #       have matching information in the dropout and censo tables
-df_teacher_level_unb %>%
+teacher_level_unb %>%
   left_join(dropout, by = c("CIE_ESCOLA", "YEAR")) %>%
   left_join(censo, by = c("CIE_ESCOLA", "YEAR")) %>%
   left_join(inse, by = c("CIE_ESCOLA")) %>%
@@ -392,30 +401,30 @@ df_teacher_level_unb %>%
     perc_inse = round(100 * inse / total_professores, 2))
 
 # Merge dropout and censo with panel data
-df_teacher_level_unb <- df_teacher_level_unb %>%
+teacher_level_unb <- teacher_level_unb %>%
   inner_join(dropout, by = c("CIE_ESCOLA", "YEAR")) %>%
   inner_join(censo, by = c("CIE_ESCOLA", "YEAR")) %>%
   inner_join(inse, by = c("CIE_ESCOLA"))
 
 # Replace info on absences with NA for those teachers who are not in the absences table 
-df_teacher_level_unb <- df_teacher_level_unb %>% 
+teacher_level_unb <- teacher_level_unb %>% 
   mutate(across(matches("^(TT|TOT)"), ~ replace_na(.x, 0)))
 
 # Getting number of days in month 
-df_teacher_level_unb$TOTAL_DIAS_MES <- days_in_month(as.Date(paste0("01", df_teacher_level_unb$DATE), format = "%d%m%y"))
+teacher_level_unb$TOTAL_DIAS_MES <- days_in_month(as.Date(paste0("01", teacher_level_unb$DATE), format = "%d%m%y"))
 
 # Absence rate
-df_teacher_level_unb[, ABS_RATE := TOT_DIAS_AUSENCIAS / TOTAL_DIAS_MES]
+teacher_level_unb[, ABS_RATE := TOT_DIAS_AUSENCIAS / TOTAL_DIAS_MES]
 
 # Saving data
-saveRDS(df_teacher_level_unb, file = paste0(getwd(), "/1_data/df_teacher_level_unb.rds"))
+saveRDS(teacher_level_unb, file = paste0(getwd(), "/1_data/teacher_level_unb.rds"))
 
 # ------- Balanced panel
 # Panel length
-panel_length<-n_distinct(df_teacher_level_unb$DATE)
+panel_length<-n_distinct(teacher_level_unb$DATE)
 
 # Keep only teachers who appear in every month
-df_teacher_level_bal <- df_teacher_level_unb %>%
+teacher_level_bal <- teacher_level_unb %>%
   group_by(ID_INTERNO) %>%
   mutate(n = n_distinct(DATE)) %>%
   filter(n == panel_length) %>%
@@ -423,22 +432,21 @@ df_teacher_level_bal <- df_teacher_level_unb %>%
   ungroup()
 
 # Check 
-df_teacher_level_bal %>% 
+teacher_level_bal %>% 
   group_by(YEAR) %>% 
   summarise(n_teachers = n_distinct(ID_INTERNO))
 
 # Proportion of rows retained after balancing
-nrow(df_teacher_level_bal) / nrow(df_teacher_level_unb)
+nrow(teacher_level_bal) / nrow(teacher_level_unb)
 
 # Saving data
-saveRDS(df_teacher_level_bal, file = paste0(getwd(), "/1_data/df_teacher_level_bal.rds"))
+saveRDS(teacher_level_bal, file = paste0(getwd(), "/1_data/teacher_level_bal.rds"))
 
 # ---------------------------------------
 # ------- Final school-level panel ------
 #----------------------------------------
-
 # ---- School-level panel unbalanced 
-df_school_level_unb <- df_teacher_level_unb %>%
+school_level_unb <- teacher_level_unb %>%
   group_by(YEAR, CIE_ESCOLA, CO_MUNICIPIO, NO_CATEGORIA) %>%
   summarise(
     n_prof          = n_distinct(ID_INTERNO),
@@ -473,13 +481,13 @@ df_school_level_unb <- df_teacher_level_unb %>%
   )
 
 # Saving data
-saveRDS(df_school_level_unb, file = paste0(getwd(), "/1_data/df_school_level_unb.rds"))
+saveRDS(school_level_unb, file = paste0(getwd(), "/1_data/school_level_unb.rds"))
 
 
 # -------- School-level panel balanced
 
 # Keep only schools that appear in every year
-df_school_level_bal <- df_school_level_unb %>%
+school_level_bal <- school_level_unb %>%
   group_by(CIE_ESCOLA) %>%
   mutate(n = n_distinct(YEAR)) %>%
   filter(n == 3) %>%
@@ -487,11 +495,11 @@ df_school_level_bal <- df_school_level_unb %>%
   ungroup()
 
 # Check 
-df_school_level_bal %>% 
+school_level_bal %>% 
   group_by(YEAR) %>% 
   summarise(n = n_distinct(CIE_ESCOLA))
 
 # Saving data
-saveRDS(df_school_level_bal, file = paste0(getwd(), "/1_data/df_school_level_bal.rds"))
+saveRDS(school_level_bal, file = paste0(getwd(), "/1_data/school_level_bal.rds"))
 
 
