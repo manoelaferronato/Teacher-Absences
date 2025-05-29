@@ -27,6 +27,8 @@
 \hspace{1em}Maternity leave & 0.04 & 0.14 & - & -\\
 \hspace{1em}Accident leave & 0.00 & 0.00 & - & -\\
 \hspace{1em}Personal leave & 0.28 & 0.00 & - & -\\
+\midrule
+\hspace{1em}N (teachers) & 97289.00 & 126831.00 & - & -\\
 \bottomrule
 \end{tabular}
 \begin{tablenotes}[para]

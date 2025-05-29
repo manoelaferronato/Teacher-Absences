@@ -1,0 +1,36 @@
+\begin{table}[!h]
+\centering
+\caption{Descriptive statistics of schools by location}
+\centering
+\resizebox{\ifdim\width>\linewidth\linewidth\else\width\fi}{!}{
+\begin{threeparttable}
+\begin{tabular}[t]{lcccc}
+\toprule
+ & Urban & Rural & Difference & SE\\
+\midrule
+\addlinespace[0.3em]
+\multicolumn{5}{l}{\textbf{Teacher Characteristics}}\\
+\hspace{1em}Number of teachers & 49.98 & 28.28 & -21.69 & 0.59\\
+\hspace{1em}Age & 46.02 & 44.42 & -1.61 & 0.12\\
+\hspace{1em}Experience & 8.78 & 7.67 & -1.12 & 0.10\\
+\hspace{1em}Contract teachers & 0.43 & 0.50 & 0.07 & 0.01\\
+\addlinespace[0.3em]
+\multicolumn{5}{l}{\textbf{Absences}}\\
+\hspace{1em}Absence rate & 0.07 & 0.07 & 0.00 & 0.00\\
+\hspace{1em}Proportion of teachers with more than 10 days of absence in a month & 0.06 & 0.06 & 0.00 & 0.00\\
+\addlinespace[0.3em]
+\multicolumn{5}{l}{\textbf{School Characteristics}}\\
+\hspace{1em}Number of students & 668.22 & 256.28 & -411.94 & 9.01\\
+\hspace{1em}Pupil-teacher ratio & 12.95 & 8.66 & -4.29 & 0.17\\
+\hspace{1em}Dropout rate & 1.95 & 1.31 & -0.64 & 0.10\\
+\hspace{1em}INSE & 5.22 & 4.93 & -0.29 & 0.02\\
+\midrule
+\hspace{1em}N (schools) & 4868.00 & 153.00 & - & -\\
+\bottomrule
+\end{tabular}
+\begin{tablenotes}[para]
+\item \textit{Note.} 
+\item Statistics were calculated using an unbalanced monthly panel from 2021 to 2023. Data for May 2021 is not available. Teaching experience is measured by the number of years since the earliest recorded contract. The number of students includes both primary/lower secondary and upper secondary levels. Dropout rates represent the average of lower and upper secondary school dropout rates. INSE refers to the Socioeconomic Level Indicator of each school, as calculated by INEP.
+\end{tablenotes}
+\end{threeparttable}}
+\end{table}

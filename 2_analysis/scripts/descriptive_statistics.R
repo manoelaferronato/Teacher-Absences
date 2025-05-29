@@ -78,6 +78,20 @@ tab_temp <- tab_temp %>%
 tab1 <- tab1 %>%
   rbind(tab_temp, fill = T) 
 
+# Number of observations
+tab1_n <- data.frame(
+  Var = "N (teachers)",
+  Efetivo = length(unique(teacher_level_unb$ID_INTERNO[
+    teacher_level_unb$CATEG_corr == "Efetivo"])),
+  Temporário = length(unique(teacher_level_unb$ID_INTERNO[
+    teacher_level_unb$CATEG_corr == "Temporário"])),
+  Diff = NA,
+  SE_Diff = NA
+)
+
+# Junta com sua tabela original
+tab1 <- rbind(tab1, tab1_n)
+
 # ------- Table to Latex ----------- 
 
 options(knitr.kable.NA = '-')
@@ -94,9 +108,91 @@ tab1 <- tab1 %>%
   threeparttable = TRUE) %>%
   group_rows("General Characteristics", 1, 3) %>%
   group_rows("Education and Training", 4, 5) %>%
-  group_rows("Absences", 6, nrow(tab1)) 
+  group_rows("Absences", 6, nrow(tab1)) %>%
+  row_spec(13, hline_after = TRUE)
 
 # Saving
 writeLines(tab1, "2_analysis/outputs/tab1.txt")
          
-         
+# -------- Table 2: Descriptive statistics of schools by location --------------------
+
+# Reading school data
+school_level_unb <- readRDS("1_data/school_level_unb.rds")
+
+# Set as dt
+setDT(school_level_unb)
+
+# Pupil-teacher ratio
+school_level_unb[, aluno_prof := qt_mat/n_prof]
+
+# Function to calculate mean, means difference and standard-error of means differences
+stats <- function(var, name = var) {
+  dt <- school_level_unb[,
+                          .(
+                            mean  = mean(get(var), na.rm = TRUE),
+                            sd    = sd(get(var), na.rm = TRUE),
+                            n     = .N
+                          ),
+                          by = "NO_CATEGORIA"
+  ]
+  
+  dt[, .(
+    Var = name,
+    Urban = mean[NO_CATEGORIA == "Urbana"],
+    Rural = mean[NO_CATEGORIA == "Rural"],
+    Diff = diff(mean),
+    SE_Diff = sqrt(sum((sd^2) / n))
+  )]
+}
+
+# Selecting variables          
+variables <- list(n_prof = "Number of teachers",
+                  idade_media = "Age",
+                  exp_media = "Experience",
+                  prop_temp = "Contract teachers",
+                  abs_rate_medio = "Absence rate", 
+                  prop_prof_10dias = "Proportion of teachers with more than 10 days of absence in a month",
+                  qt_mat = "Number of students",
+                  aluno_prof = "Pupil-teacher ratio",
+                  drop_mean = "Dropout rate",
+                  inse = "INSE")
+
+# Execute function in selected variables
+tab2 <- rbindlist(
+  Map(stats, names(variables), variables)
+)
+
+# Number of observations
+tab2_n <- data.frame(
+  Var   = "N (schools)",
+  Urban = length(unique(school_level_unb$CIE_ESCOLA[
+    school_level_unb$NO_CATEGORIA == "Urbana"])),
+  Rural = length(unique(school_level_unb$CIE_ESCOLA[
+    school_level_unb$NO_CATEGORIA == "Rural"])),
+  Diff     = NA_real_,
+  SE_Diff  = NA_real_
+)
+
+# Join with original table
+tab2 <- rbind(tab2, tab2_n)
+
+# ------- Table to Latex ----------- 
+
+tab2 <- tab2 %>%
+  kable("latex", digits = 2, booktabs = TRUE,
+        col.names = c("", "Urban", "Rural", "Difference", "SE"),
+        caption = "Descriptive statistics of schools by location",
+        align = "lcccccc") %>%
+  kable_styling(latex_options = c("scale_down", "hold_position")) %>%
+  footnote(general_title = "Note.",
+           general = "Statistics were calculated using an unbalanced monthly panel from 2021 to 2023. Data for May 2021 is not available. Teaching experience is measured by the number of years since the earliest recorded contract. The number of students includes both primary/lower secondary and upper secondary levels. Dropout rates represent the average of lower and upper secondary school dropout rates. INSE refers to the Socioeconomic Level Indicator of each school, as calculated by INEP.",
+           footnote_as_chunk = TRUE,
+           threeparttable = TRUE) %>%
+  group_rows("Teacher Characteristics", 1, 4) %>%
+  group_rows("Absences", 5, 6) %>%
+  group_rows("School Characteristics", 7, nrow(tab2)) %>%
+  row_spec(10, hline_after = TRUE)
+
+# Saving
+writeLines(tab2, "2_analysis/outputs/tab2.txt")
+
