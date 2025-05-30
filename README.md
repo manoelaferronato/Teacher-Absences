@@ -2,7 +2,7 @@
 
 ## Overview
 
-This repository contains scripts and documentation for cleaning, merging, and analyzing a database of teacher absences in São Paulo’s state schools. My goal is to estimate the relationship between teacher absenteeism and student dropout. In particular, I aim to address whether the effect differs between civil-srevant and contract teachers and across urban versus rural schools.
+This repository contains scripts and documentation for cleaning, merging, and analyzing a database of teacher absences in São Paulo’s state schools. My goal is to estimate the relationship between teacher absenteeism and student dropout. In particular, I aim to address whether the effect differs between civil-servant and contract teachers and across urban versus rural schools.
 
 ## Research Questions & Hypotheses
 
