@@ -20,13 +20,13 @@
 \addlinespace[0.3em]
 \multicolumn{5}{l}{\textbf{Absences}}\\
 \hspace{1em}Absence rate & 0.11 & 0.03 & 0.08 & 0.00\\
-\hspace{1em}Sick leave & 0.03 & 0.10 & - & -\\
-\hspace{1em}Justified absences & 0.04 & 0.06 & - & -\\
-\hspace{1em}Unjustified absences & 0.03 & 0.02 & - & -\\
-\hspace{1em}Seniority leave & 0.08 & 0.00 & - & -\\
-\hspace{1em}Maternity leave & 0.04 & 0.14 & - & -\\
+\hspace{1em}Sick leave & 0.06 & 0.32 & - & -\\
+\hspace{1em}Justified absences & 0.08 & 0.17 & - & -\\
+\hspace{1em}Unjustified absences & 0.07 & 0.05 & - & -\\
+\hspace{1em}Seniority leave & 0.16 & 0.01 & - & -\\
+\hspace{1em}Maternity leave & 0.08 & 0.44 & - & -\\
 \hspace{1em}Accident leave & 0.00 & 0.00 & - & -\\
-\hspace{1em}Personal leave & 0.28 & 0.00 & - & -\\
+\hspace{1em}Personal leave & 0.56 & 0.00 & - & -\\
 \midrule
 \hspace{1em}N (teachers) & 97289.00 & 126831.00 & - & -\\
 \bottomrule

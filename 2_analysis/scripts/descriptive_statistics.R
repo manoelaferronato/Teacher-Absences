@@ -53,19 +53,25 @@ tab1 <- rbindlist(
 
 # Calculating proportion of absences by motive in a temp table
 tab_temp <- teacher_level_unb[TOT_DIAS_AUSENCIAS > 0, .(
-  `Sick leave`     = sum(TT_DIAS_FALTA_MEDICA, na.rm = TRUE),
-  `Justified absences`       = sum(TT_DIAS_FALTA_JUST, na.rm = TRUE),
-  `Unjustified absences`     = sum(TT_DIAS_FALTA_INJUST, na.rm = TRUE),
-  `Seniority leave` = sum(TT_DIAS_LIC_PREMIO, na.rm = TRUE),
-  `Maternity leave`   = sum(TT_DIAS_LIC_GESTANTE, na.rm = TRUE),
-  `Accident leave`  = sum(TT_DIAS_LIC_ACID_TRAB, na.rm = TRUE),
-  `Personal leave` = sum(TT_DIAS_LIC_INTER_PARTIC, na.rm = TRUE),
-  total_geral      = sum(TOT_DIAS_AUSENCIAS, na.rm = TRUE)
-), by = CATEG_corr][
+  TT_medica     = sum(TT_DIAS_FALTA_MEDICA,     na.rm = TRUE),
+  TT_just       = sum(TT_DIAS_FALTA_JUST,       na.rm = TRUE),
+  TT_injust     = sum(TT_DIAS_FALTA_INJUST,     na.rm = TRUE),
+  TT_premio     = sum(TT_DIAS_LIC_PREMIO,       na.rm = TRUE),
+  TT_gestante   = sum(TT_DIAS_LIC_GESTANTE,     na.rm = TRUE),
+  TT_acidente   = sum(TT_DIAS_LIC_ACID_TRAB,    na.rm = TRUE),
+  TT_pessoal    = sum(TT_DIAS_LIC_INTER_PARTIC, na.rm = TRUE)
+), by = CATEG_corr][,
+  total_geral      := rowSums(.SD), .SDcols = patterns("^TT_")][
   , lapply(.SD, function(x) as.numeric(x / total_geral)), 
   by = CATEG_corr][
     , total_geral := NULL]
 
+# Renaming
+setnames(tab_temp,
+         old = c("TT_medica","TT_just","TT_injust","TT_premio",
+                 "TT_gestante","TT_acidente","TT_pessoal"),
+         new = c("Sick leave","Justified absences","Unjustified absences",
+                 "Seniority leave","Maternity leave","Accident leave","Personal leave"))
 # Tidying temp table 
 tab_temp <- tab_temp %>%
   pivot_longer(-CATEG_corr, 
@@ -113,7 +119,7 @@ tab1 <- tab1 %>%
 
 # Saving
 writeLines(tab1, "2_analysis/outputs/tab1.txt")
-         
+  
 # -------- Table 2: Descriptive statistics of schools by location --------------------
 
 # Reading school data
