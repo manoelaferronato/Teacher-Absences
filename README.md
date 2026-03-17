@@ -1,16 +1,14 @@
-# Teacher Absences and School Dropout in São Paulo
+# Teacher Absences and School Dropout in São Paulo (in progress)
 
 ## Overview
 
-This repository contains scripts and documentation for cleaning, merging, and analyzing a database of teacher absences in São Paulo’s state schools. My goal is to estimate the relationship between teacher absenteeism and student dropout. In particular, I aim to address whether the effect differs between civil-servant and contract teachers and across urban versus rural schools.
+This repository contains scripts and documentation for cleaning, merging, and analyzing a database of teacher absences in São Paulo’s state schools. My goal is to estimate the relationship between teacher absenteeism and student dropout. In particular, I aim to address whether the effect differs between permanent civil servants and contract teachers, and between urban and rural schools.
 
 ## Research Questions & Hypothesis
 
 * **RQ 1**  Does teacher absenteeism increase school dropout?
 * **RQ 2**  Does the magnitude of the effect vary with teacher contract type and school location?
-* **H1**  Higher teacher absence rates are associated with higher dropout. 
-* **H2**  Contract teachers have lower absence rates and outnumber civil-servant teachers in rural schools, potentially contributing to lower dropout in these areas.
-
+* 
 ## Data
 
 | Level   | Source                                                                                                                        | Years     | Key fields                                |
